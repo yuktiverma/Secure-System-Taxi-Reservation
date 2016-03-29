@@ -1,0 +1,90 @@
+package com.certificate;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.OutputStream;
+import java.math.BigInteger;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.Security;
+import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Random;
+
+import javax.security.auth.x500.X500Principal;
+
+import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.jce.X509Principal;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.x509.X509V3CertificateGenerator;
+
+import sun.security.tools.keytool.CertAndKeyGen;
+import sun.security.x509.X500Name;
+
+import java.io.FileOutputStream;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.util.Date;
+
+
+
+
+
+public class CopyOfDigitalCertificate
+{
+	
+	    private static final int keysize = 2048;
+	    private static final String commonName = "AAKRITI";
+	    private static final String organizationalUnit = "IT";
+	    private static final String organization = "test";
+	    private static final String city = "test";
+	    private static final String state = "test";
+	    private static final String country = "DE";
+	    private static final long validity = 1096; // 3 years
+	    private static final String alias = "tomcat";
+	    private static final char[] keyPass = "changeit".toCharArray();
+
+	    // copied most ideas from sun.security.tools.KeyTool.java
+
+	    @SuppressWarnings("restriction")
+	    public static void main(String[] args) throws Exception {
+
+	        KeyStore keyStore = KeyStore.getInstance("JKS");
+	        keyStore.load(null, null);
+
+	        CertAndKeyGen keypair = new CertAndKeyGen("RSA", "SHA256WithRSA", null);
+
+	        X500Name x500Name = new X500Name(commonName, organizationalUnit, organization, city, state, country);
+
+	        keypair.generate(keysize);
+	        PrivateKey privKey = keypair.getPrivateKey();
+
+	        X509Certificate[] chain = new X509Certificate[1];
+
+	        chain[0] = keypair.getSelfCertificate(x500Name, new Date(), (long) validity * 24 * 60 * 60);
+
+	        keyStore.setKeyEntry(alias, privKey, keyPass, chain);
+
+	        keyStore.store(new FileOutputStream(".keystore"), keyPass);
+
+
+
+	    }
+	}
+
